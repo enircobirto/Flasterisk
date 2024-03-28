@@ -1,4 +1,4 @@
-from flask_auto_router.Auto import Auto
+from flasterisk.Auto import Auto
 from flask import Flask, jsonify
 
 app = Flask(__name__)

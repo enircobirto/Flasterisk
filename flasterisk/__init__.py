@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-class AutoRouter():
+class Flasterisk():
     def __init__(self,name,subchannels=[],exceptions=[]):
         self.blueprint = Blueprint(name,__name__)
         self.name = name
@@ -16,7 +16,10 @@ class AutoRouter():
             if callable(getattr(self,propName)) and propName!='defineroutes' and not propName.startswith('_'):
                 method = getattr(self,propName)
                 func = method.__func__
-                config = func.__kwdefaults__
+                if func.__kwdefaults__ is not None:
+                    kwdefaults = func.__kwdefaults__
+                else:
+                    kwdefaults = {}
                 
                 # Default config
                 config = {
@@ -26,19 +29,18 @@ class AutoRouter():
                 }
                 
                 # If there are extra configs in the function declaration
-                if func.__kwdefaults__ is not None:
-                    config.update(func.__kwdefaults__)
+                config.update(kwdefaults)
                 
                 # co_varnames, sliced from the argcount and excluding 'self'
                 config['vars'] = [v for v in func.__code__.co_varnames[:func.__code__.co_argcount] if v != 'self']
                 
-                # routing the vars backwards
+                # Routing the vars backwards
                 for var in config['vars'][::-1]:
                     config['route'] = f"/<{var}>/{config['route']}".replace("//","/")
                 
                 # If it's not a custom route, add the method name as a prefix
-                if func.__kwdefaults__.get("route","") != "":
-                    config['route'] = "/"+propName+config['route']
+                if not kwdefaults.get("route"):
+                    config['route'] = "/"+self.name+config['route']
                 
                 print(config['route'])
                 
@@ -48,3 +50,8 @@ class AutoRouter():
                     getattr(self,propName),
                     methods = config['methods'],
                 )
+
+    def _clean(self,*args):
+        for kw in args:
+            delattr(self,kw)
+        return

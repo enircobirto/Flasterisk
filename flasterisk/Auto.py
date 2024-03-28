@@ -1,11 +1,9 @@
-from flask_auto_router import AutoRouter
+from flasterisk import Flasterisk
 from flask import request, jsonify
 
-import json
-
-class Auto(AutoRouter):
+class Auto(Flasterisk):
     def __init__(self):
-        AutoRouter.__init__(self,"auto")
+        Flasterisk.__init__(self,"auto")
 
     def hello(self):
         return "Hello!", 200
@@ -17,6 +15,6 @@ class Auto(AutoRouter):
         elif request.method == 'GET':
             return jsonify(result="!olleH", status=200)
 
-    def olleh2(self, backwards, normal, *, route="/olleh2/",methods=['GET']):
+    def olleh2(self, backwards, normal):
         return jsonify(result=backwards[::-1]+" "+normal, status=200)
 
