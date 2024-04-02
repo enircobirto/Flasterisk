@@ -9,6 +9,7 @@ class Auto(Flasterisk):
         return "Hello!", 200
 
     def olleh(self, *, methods=['POST','GET']):
+        del methods
         if request.method == 'POST':
             req = request.get_json()
             return jsonify(result=f"{req.get('message','Hello!')[::-1]}", status=200)
@@ -17,4 +18,12 @@ class Auto(Flasterisk):
 
     def olleh2(self, backwards, normal):
         return jsonify(result=backwards[::-1]+" "+normal, status=200)
+
+    def example(self, text, *, methods=['POST']):
+        del methods
+        if request.method == 'POST':
+            req = request.get_json()
+            return jsonify(result = req.get('text','Hello!'), status = 200)
+        elif request.method == 'GET':
+            return jsonify(result = text, status = 200)
 
