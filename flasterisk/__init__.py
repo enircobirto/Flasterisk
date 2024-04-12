@@ -3,11 +3,9 @@ import inspect
 import re
 
 class Flasterisk():
-    def __init__(self,name,subchannels=[],exceptions=[]):
+    def __init__(self,name):
         self.blueprint = Blueprint(name,__name__)
         self.name = name
-        self.subchannels = subchannels
-        self.exceptions = exceptions
         self.routes = {}
         self.defineroutes()
         return
@@ -17,7 +15,8 @@ class Flasterisk():
         for propName in dir(self):
             # Separates methods, excluding 'defineroutes' and any function starting with '_'
             if callable(getattr(self,propName)) and propName!='defineroutes' and not propName.startswith('_'):
-                method = getattr(self,propName)
+                methodName = propName
+                method = getattr(self,methodName)
                 func = method.__func__
                 if func.__kwdefaults__ is not None:
                     kwdefaults = func.__kwdefaults__
@@ -25,7 +24,7 @@ class Flasterisk():
                     kwdefaults = {}
                 
                 # Default config
-                name = propName
+                name = methodName
                 config = {
                     "route": f"/{name}",
                     "methods": ['GET'],
@@ -56,14 +55,14 @@ class Flasterisk():
                 if not kwdefaults.get("route"):
                     config['route'] = "/"+self.name+config['route']
                 
-                # Saving the route configuration
-                self.routes[propName] = config['route']
+                # Saving the route configuration, based on the method name
+                self.routes[methodName] = config['route']
                 
                 print(config['route'])
                 self.blueprint.add_url_rule(
                     config['route'],
-                    propName,
-                    getattr(self,propName),
+                    methodName,
+                    getattr(self,methodName),
                     methods = config['methods'],
                 )
 
