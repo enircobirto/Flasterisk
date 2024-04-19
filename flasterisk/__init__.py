@@ -15,8 +15,8 @@ class Flasterisk():
         for propName in dir(self):
             # Separates methods, excluding 'defineroutes' and any function starting with '_'
             if callable(getattr(self,propName)) and propName!='defineroutes' and not propName.startswith('_'):
-                methodName = propName
-                method = getattr(self,methodName)
+                method_name = propName
+                method = getattr(self,method_name)
                 func = method.__func__
                 if func.__kwdefaults__ is not None:
                     kwdefaults = func.__kwdefaults__
@@ -24,7 +24,7 @@ class Flasterisk():
                     kwdefaults = {}
                 
                 # Default config
-                name = methodName
+                name = method_name
                 config = {
                     "route": f"/{name}",
                     "methods": ['GET'],
@@ -55,14 +55,28 @@ class Flasterisk():
                 if not kwdefaults.get("route"):
                     config['route'] = "/"+self.name+config['route']
                 
+                for stored_method_name,rt in self.routes.items():
+                    if rt['route'] == config['route']:
+                        for cfg_method in config['methods']:
+                            if cfg_method in rt['methods']:
+                                raise DuplicatedRoute(f"""
+                                
+                                Method "{cfg_method}" for the route "{config['route']}" is duplicated!
+                                The server will not execute.
+                                
+                                Previous definition: {self.name} -> {stored_method_name}
+                                Current definition:  {self.name} -> {method_name}
+
+                                Resolve the conflict before proceeding.
+                                """.replace("    ",""))
+
                 # Saving the route configuration, based on the method name
-                self.routes[methodName] = config['route']
+                self.routes[method_name] = {'route':config['route'],'methods':config['methods']}
                 
-                print(config['route'])
                 self.blueprint.add_url_rule(
                     config['route'],
-                    methodName,
-                    getattr(self,methodName),
+                    method_name,
+                    getattr(self,method_name),
                     methods = config['methods'],
                 )
 
@@ -76,7 +90,7 @@ class Flasterisk():
         result = {}
         
         funcName = inspect.stack()[1].function
-        route = self.routes[funcName]
+        route = self.routes[funcName]['route']
         func = getattr(self, funcName).__func__
         kwdefaults = func.__kwdefaults__
         
@@ -110,3 +124,16 @@ class Flasterisk():
                 ok = False
         
         return {'ok':ok, 'result':result}
+
+    def _show_routes(self):
+        s = self.name+":\n"
+        routes = sorted(self.routes.items(), key=lambda item:item[1]['route'])
+        maxlength = max([len(r['route']) for _,r in routes])
+        for method_name,route in routes:
+            s+=f"  {method_name}:\n"
+            s+=f"    {route['route'].ljust(maxlength+2)} {', '.join(route['methods'])}\n"
+            s+="\n"
+        return s
+
+class DuplicatedRoute(Exception):
+    """The route is duplicated."""

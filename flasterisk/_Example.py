@@ -1,7 +1,7 @@
 from flasterisk import Flasterisk
 from flask import request, jsonify
 
-class Example(Flasterisk):
+class _Example(Flasterisk):
     def __init__(self):
         self.abouts = {}
         Flasterisk.__init__(self,"example")
