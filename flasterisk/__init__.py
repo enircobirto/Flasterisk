@@ -1,21 +1,23 @@
+from flasterisk.RuleCheck import RuleCheck
 from flask import Blueprint, request
 import inspect
 import re
 
 class Flasterisk():
-    def __init__(self,name):
+    def __init__(self,name,*args,**kwargs):
         self.blueprint = Blueprint(name,__name__)
         self.name = name
         self.routes = {}
-        self.defineroutes()
+        self.props = kwargs
+        self._defineroutes()
         return
 
-    def defineroutes(self):
+    def _defineroutes(self):
         # Gets all properties
-        for propName in dir(self):
+        for attr_name in dir(self):
             # Separates methods, excluding 'defineroutes' and any function starting with '_'
-            if callable(getattr(self,propName)) and propName!='defineroutes' and not propName.startswith('_'):
-                method_name = propName
+            if callable(getattr(self,attr_name)) and not attr_name.startswith('_'):
+                method_name = attr_name
                 method = getattr(self,method_name)
                 func = method.__func__
                 if func.__kwdefaults__ is not None:
@@ -66,10 +68,10 @@ class Flasterisk():
                                 
                                 Previous definition: {self.name} -> {stored_method_name}
                                 Current definition:  {self.name} -> {method_name}
-
+                                
                                 Resolve the conflict before proceeding.
                                 """.replace("    ",""))
-
+                
                 # Saving the route configuration, based on the method name
                 self.routes[method_name] = {'route':config['route'],'methods':config['methods']}
                 
@@ -80,50 +82,18 @@ class Flasterisk():
                     methods = config['methods'],
                 )
 
-    def _check_rules(self):
+    def _check(self):
         try:
             req = request.get_json()
         except:
             req = {}
         
-        ok = True
-        result = {}
-        
-        funcName = inspect.stack()[1].function
-        route = self.routes[funcName]['route']
-        func = getattr(self, funcName).__func__
+        func_name = inspect.stack()[1].function
+        route = self.routes[func_name]['route']
+        func = getattr(self, func_name).__func__
         kwdefaults = func.__kwdefaults__
         
-        # Get URL variables
-        def clean_regex_list(result):
-            # re.findall returns a list of tuples if multiple instances are found,
-            # So we convert it to a list
-            if type(result[0]) == tuple:
-                return list(result[0])
-            # Otherwise, it's a normal list with one string
-            else:
-                return result
-        
-        # Replacing <var_name> with the string '(.*?)', so it can be extracted
-        url_expression = re.sub(r'<.*?>','(.*?)',route)
-        url_vars = {
-            var: clean_regex_list(re.findall(url_expression, request.base_url))[index]
-            for index, var in enumerate(re.findall(r'<(.*?)>',route))
-        }
-        
-        for kw in kwdefaults:
-            # Getting _regex rules and extracing the results
-            if kw.endswith("_regex"):
-                var = kw.replace("_regex","")
-                if var in url_vars:
-                    result["url_"+var] = bool(re.match("^"+kwdefaults[kw]+"$",url_vars[var]))
-                elif var in req:
-                    result["post_"+var] = bool(re.match("^"+kwdefaults[kw]+"$",req[var]))
-        for res in result:
-            if result[res] == False:
-                ok = False
-        
-        return {'ok':ok, 'result':result}
+        return RuleCheck(self,req,route,kwdefaults)
 
     def _show_routes(self):
         s = self.name+":\n"
@@ -134,6 +104,10 @@ class Flasterisk():
             s+=f"    {route['route'].ljust(maxlength+2)} {', '.join(route['methods'])}\n"
             s+="\n"
         return s
+    
+    def _add_props(self,*props):
+        self.props = {prop:getattr(self,prop) for prop in props}
+        return
 
 class DuplicatedRoute(Exception):
-    """The route is duplicated."""
+    """For when a route has two definitions for the same method."""

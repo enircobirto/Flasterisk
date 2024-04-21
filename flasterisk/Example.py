@@ -1,5 +1,5 @@
 from flasterisk import Flasterisk
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 
 class Example(Flasterisk):
     def __init__(self):
@@ -9,9 +9,10 @@ class Example(Flasterisk):
         return jsonify(msg="Hello!",status=200)
 
     def url_shout(self, msg, *, alias='shout'):
+        del alias
         return jsonify(msg=msg,status=200)
 
-    def post_shout(self, *, methods=['POST','PUT'], alias='shout'):
+    def post_put_shout(self, *, methods=['POST','PUT'], alias='shout'):
         del methods, alias
         
         if request.method == 'POST':
