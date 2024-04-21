@@ -33,17 +33,15 @@ class RuleCheck():
         
         for kw in kwdefaults:
             # Getting _regex rules and extracing the results
-            print(flasterisk_instance.props)
             if type(kwdefaults[kw]) == Prop:
                 flprop = kwdefaults[kw]
-                if flprop.prop in flasterisk_instance.props:
-                    if kw.endswith("_opts"):
-                        var = kw.replace("_opts","")
-                        if var in url_vars:
-                            result["url_"+var] = flprop.check(url_vars[var],flasterisk_instance)
-                        elif var in req:
-                            result["url_"+var] = flprop.check(req[var],flasterisk_instance)
-                    pass
+                if kw.endswith("_opts"):
+                    var = kw.replace("_opts","")
+                    if var in url_vars:
+                        result["url_"+var] = flprop.check(url_vars[var],flasterisk_instance)
+                    elif var in req:
+                        result["url_"+var] = flprop.check(req[var],flasterisk_instance)
+                pass
             
             else:
                 if kw.endswith("_regex"):
@@ -62,9 +60,9 @@ class RuleCheck():
         self.result = result
 
     def __bool__(self):
+        """Sets boolean value to the general check result"""
         ok = True
         for res in self.result:
             if self.result[res] == False:
                 ok = False
-        """Sets boolean value to the value of 'ok'"""
         return ok

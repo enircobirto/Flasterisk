@@ -4,11 +4,10 @@ import inspect
 import re
 
 class Flasterisk():
-    def __init__(self,name,*args,**kwargs):
+    def __init__(self,name):
         self.blueprint = Blueprint(name,__name__)
         self.name = name
         self.routes = {}
-        self.props = kwargs
         self._defineroutes()
         return
 
@@ -104,10 +103,6 @@ class Flasterisk():
             s+=f"    {route['route'].ljust(maxlength+2)} {', '.join(route['methods'])}\n"
             s+="\n"
         return s
-    
-    def _add_props(self,*props):
-        self.props = {prop:getattr(self,prop) for prop in props}
-        return
 
 class DuplicatedRoute(Exception):
     """For when a route has two definitions for the same method."""

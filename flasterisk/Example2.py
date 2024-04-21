@@ -5,8 +5,7 @@ from flask import request, jsonify
 class Example2(Flasterisk):
     def __init__(self):
         self.abouts = {}
-        self._add_props("abouts")
-        Flasterisk.__init__(self, "example", abouts = {})
+        Flasterisk.__init__(self, "example")
 
     def hello(self):
         msg = "Hello! This route was created simply by being declared inside the class!"
