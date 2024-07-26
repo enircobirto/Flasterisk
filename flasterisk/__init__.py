@@ -14,7 +14,7 @@ class Flasterisk():
     def _defineroutes(self):
         # Gets all properties
         for attr_name in dir(self):
-            # Separates methods, excluding 'defineroutes' and any function starting with '_'
+            # Separates methods, excluding any function starting with '_'
             if callable(getattr(self,attr_name)) and not attr_name.startswith('_'):
                 method_name = attr_name
                 method = getattr(self,method_name)
