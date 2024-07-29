@@ -19,7 +19,7 @@ from flask import Flask
 
 
 def main():
-	# Creates the Flask app
+    # Creates the Flask app
     app = Flask(__name__)
     
     # Instantiates the Example class and registers its blueprints
