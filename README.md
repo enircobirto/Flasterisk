@@ -7,6 +7,7 @@ Flasterisk is a class-based auto-router for Flask, with many configuration optio
 `
 pip install flasterisk
 `
+(Coming soon)
 
 ## Getting started
 
