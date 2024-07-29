@@ -163,5 +163,18 @@ from flasterisk.Prop import Prop
 ```
 As you can imagine, every time the _check() function is called, Flasterisk will basically run self.statuses.keys() and compare it to the variable. This concept can be endlessly expanded, with the potential to be some sort of internal query mini language of some sort. For now, dict keys is all it can do.
 
-The final status app class is in Example.py, which you can run and test it out on your own.
+The final status app class is in Example.py, which you can run and test it out on your own. For example:
+
+```bash
+curl http://localhost:5000/users/statuses
+curl -X POST http://localhost:5000/users/john/status \
+	-d '{"usr_status":"This is my status."}' \
+	-H 'Content-Type: application/json'
+curl http://localhost:5000/users/statuses
+curl http://localhost:5000/users/john/status
+curl http://localhost:5000/users/alice/status
+curl -X POST http://localhost:5000/users/john123/status \
+	-d '{"usr_status":"This is my status."}' \
+	-H 'Content-Type: application/json'
+```
 
