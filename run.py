@@ -1,12 +1,11 @@
+from Example import Example
 from flask import Flask
-import json
-
-app = Flask(__name__)
 
 def main():
-    pass
+    app = Flask(__name__)
+    example = Example()
+    app.register_blueprint(example.blueprint)
+    app.run()
 
 if __name__ == '__main__':
     main()
-    app.run(host="0.0.0.0", port=5300, debug=False)
-    
