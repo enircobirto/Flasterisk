@@ -105,6 +105,18 @@ $ curl http://localhost:5000/example/hello
 {"message":"Hello!","status":200}
 ```
 
+### Route
+You can also specify the full route, and it'll substitute it together with the prefix (specified within \_\_init\_\_).
+```python
+    def internal_method_name(self, *, route="/hello"):
+        del alias
+        return jsonify(result="Hello!", status=200)
+```
+```bash
+$ curl http://localhost:5000/hello
+{"message":"Hello!","status":200}
+```
+
 ## Experimental configuration options
 Since this \_\_kwdefaults\_\_ technique offers such potential, I decided to play around with some possibilities. Everything past this point might not be extremely useful. For this, we'll create a simple user status manager.
 ```python
