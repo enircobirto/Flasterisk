@@ -95,7 +95,7 @@ $ curl -X POST http://localhost:5000/example/olleh \
 
 ### Alias
 The alias is simply a way to overwrite the original name of the method:
-```
+```python
     def internal_method_name(self, *, alias="hello"):
         del alias
         return jsonify(result="Hello!", status=200)
@@ -115,7 +115,7 @@ class Example(Flasterisk):
 
 ```
 ### Regex (+ _check)
-When a variable is set (in this example, "name"), and one of the \_\_kwdefaults\_\_ parameters is the same name + _regex (in this example, "usr_regex"), you can call the function _check(), which will return the result of a rule check with all the available rules.
+When a variable is set (in this example, "usr"), and one of the \_\_kwdefaults\_\_ parameters is the same name + _regex (in this example, "usr_regex"), you can call the function _check(), which will return the result of a rule check with all the available rules.
 ```python
     def set_usr_status(
             self,usr,
@@ -133,7 +133,7 @@ When a variable is set (in this example, "name"), and one of the \_\_kwdefaults\
                     self.statuses.update({usr: req['usr_status']})
                     return jsonify(info = f"{usr}'s status is now '{req['usr_status']}'.",status = 200)
 ```
-In this case, "name" will be limited to the regex '\^[a-z]+$', which means only lowercase letters. (^ and $ are added within the _check method to avoid polluting the code too much. If the check fails, _check() will return False with a list of all the available checks.
+In this case, "usr" will be limited to the regex '\^[a-z]+$', which means only lowercase letters. (^ and $ are added within the _check method to avoid polluting the code too much. If the check fails, _check() will return False with a list of all the available checks.
 
 It will also work for keys _within_ the POST request!
 
