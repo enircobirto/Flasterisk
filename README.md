@@ -174,7 +174,7 @@ from flasterisk.Prop import Prop
             return jsonify(info = f"Unable to see status!",status = 200)
         return jsonify(usr_status = self.statuses.get(usr,""), status = 200)
 ```
-As you can imagine, every time the _check() function is called, Flasterisk will basically run self.statuses.keys() and compare it to the variable. This concept can be endlessly expanded, with the potential to be some sort of internal query mini language of some sort. For now, dict keys is all it can do.
+As you can imagine, every time the _check() function is called, Flasterisk will basically run self.statuses.keys() and compare it to the variable. This concept can be endlessly expanded, with the potential to be a query mini language of some sort. For now, dict keys is all it can do.
 
 The final status app class is in Example.py, which you can run and test it out on your own. For example:
 
